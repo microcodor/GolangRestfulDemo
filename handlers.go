@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"strconv"
 
-	_ "../github.com/go-sql-driver/mysql"
-	"../github.com/gorilla/mux"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
