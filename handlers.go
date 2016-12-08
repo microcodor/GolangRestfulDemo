@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
+	seelog "github.com/cihub/seelog"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
@@ -32,7 +33,7 @@ func GetWpterms(w http.ResponseWriter, r *http.Request) {
 }
 
 func QueryWpterms(w http.ResponseWriter) {
-
+	seelog.Error("QueryWpterms")
 	wptermsbean := new(WpTermsBean)
 	wptermsbean.Common.Code = 0
 	wptermsbean.Common.Msg = "数据异常"
@@ -40,6 +41,7 @@ func QueryWpterms(w http.ResponseWriter) {
 	rows, err := db.Query("SELECT * FROM wp_terms WHERE slug like 'wx_%'")
 	if err != nil {
 		panic(err.Error())
+		seelog.Error(err.Error())
 		wptermsbean.Common.Msg = err.Error()
 	}
 	defer rows.Close()
@@ -49,7 +51,7 @@ func QueryWpterms(w http.ResponseWriter) {
 
 		err = rows.Scan(&wpterm.Termid, &wpterm.Name, &wpterm.Slug, &wpterm.Termgroup)
 		if err != nil {
-			log.Fatal(err)
+			seelog.Error(err.Error())
 			wptermsbean.Common.Msg = err.Error()
 		}
 		wptermsbean.WpTerms = append(wptermsbean.WpTerms, wpterm)
@@ -62,7 +64,8 @@ func QueryWpterms(w http.ResponseWriter) {
 		wptermsbean.Common.Msg = "查询分类成功"
 	}
 	if err := json.NewEncoder(w).Encode(wptermsbean); err != nil {
-		panic(err)
+		//panic(err)
+		seelog.Error(err.Error())
 	}
 }
 
@@ -78,7 +81,7 @@ func GetWpuser(w http.ResponseWriter, r *http.Request) {
 	var userId int
 	var err error
 	if userId, err = strconv.Atoi(vars["userId"]); err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	}
 	//需要完善
 	wpuserbean.User, err = QueryWpuser(userId)
@@ -90,7 +93,7 @@ func GetWpuser(w http.ResponseWriter, r *http.Request) {
 			log.Print("没有结果")
 			wpuserbean.Common.Msg = "未查到相关用户"
 		} else {
-			panic(err)
+			seelog.Error(err.Error())
 			wpuserbean.Common.Msg = err.Error()
 		}
 
@@ -100,7 +103,7 @@ func GetWpuser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(wpuserbean); err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	}
 }
 
@@ -128,7 +131,7 @@ func GetWppost(w http.ResponseWriter, r *http.Request) {
 	var postId int
 	var err error
 	if postId, err = strconv.Atoi(vars["postId"]); err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	} else {
 		wppostbean.Wppost, err = QuerytWppost(postId)
 		if err == nil {
@@ -143,7 +146,7 @@ func GetWppost(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(wppostbean); err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	}
 
 }
@@ -155,7 +158,7 @@ func QuerytWppost(postId int) (Wppost, error) {
 		"where ID = ?")
 	rows, err := stmt.Query(postId)
 	if err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	}
 	defer rows.Close()
 
@@ -164,14 +167,13 @@ func QuerytWppost(postId int) (Wppost, error) {
 		err = rows.Scan(&wppost.Id, &wppost.TermId, &wppost.PostAuthor,
 			&wppost.PostDate, &wppost.PostTitle, &wppost.PostContent, &wppost.CommentStatus, &wppost.PostUrl, &wppost.CommentCount)
 		if err != nil {
-			log.Fatal(err)
+			seelog.Error(err.Error())
 		}
 	}
 	//需要完善
 	wppost.User, err = QueryWpuser(wppost.PostAuthor)
 	if err != nil {
-		log.Fatal(err)
-		//fmt.Fprintf(w, err.Error())
+		seelog.Error(err.Error())
 
 	}
 	return wppost, err
@@ -191,13 +193,13 @@ func GetSimplePosts(w http.ResponseWriter, r *http.Request) {
 	var num int
 	var err error
 	if termId, err = strconv.Atoi(vars["termId"]); err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	}
 	if postId, err = strconv.Atoi(vars["postId"]); err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	}
 	if num, err = strconv.Atoi(vars["num"]); err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	}
 	if termId == 0 || postId == 0 || num == 0 {
 		simplewppostsbean.Common.Msg = "请求参数错误"
@@ -212,7 +214,7 @@ func GetSimplePosts(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(simplewppostsbean); err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	}
 
 }
@@ -226,7 +228,7 @@ func QuerySimplePosts(termId int, postId int, num int) ([]Wppost, error) {
 		"where posts.post_status='publish' and termships.term_taxonomy_id=? and posts.ID>? LIMIT ?")
 	rows, err := stmt.Query(termId, postId, num)
 	if err != nil {
-		log.Fatal(err)
+		seelog.Error(err.Error())
 	}
 	defer rows.Close()
 
@@ -236,7 +238,7 @@ func QuerySimplePosts(termId int, postId int, num int) ([]Wppost, error) {
 		err = rows.Scan(&wppost.Id, &wppost.TermId, &wppost.PostAuthor,
 			&wppost.PostTitle, &wppost.PostUrl, &wppost.PostDate, &wppost.CommentCount, &wppost.User.NickName)
 		if err != nil {
-			log.Fatal(err)
+			seelog.Error(err.Error())
 		} else {
 			wppost.User.Id = wppost.PostAuthor
 			wpposts = append(wpposts, wppost)
