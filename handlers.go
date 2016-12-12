@@ -220,12 +220,12 @@ func GetSimplePosts(w http.ResponseWriter, r *http.Request) {
 }
 
 func QuerySimplePosts(termId int, postId int, num int) ([]Wppost, error) {
-	stmt, _ := db.Prepare("select posts.ID as post_id,termships.term_taxonomy_id as term_id,posts.post_author as user_id," +
+	stmt, _ := db.Prepare("select * from (select posts.ID as post_id,termships.term_taxonomy_id as term_id,posts.post_author as user_id," +
 		"posts.post_title as post_title,posts.guid as post_url,posts.post_date as post_date," +
 		"posts.comment_count as comment_count,users.user_nicename as user_nicename from db_wordpress.wp_posts posts " +
 		"inner join db_wordpress.wp_users users on posts.post_author=users.ID " +
 		"inner join db_wordpress.wp_term_relationships termships on termships.object_id=posts.ID " +
-		"where posts.post_status='publish' and termships.term_taxonomy_id=? and posts.ID>? LIMIT ?")
+		"where posts.post_status='publish' and termships.term_taxonomy_id=? and posts.ID>?  LIMIT ?) as art ORDER BY art.post_id DESC")
 	rows, err := stmt.Query(termId, postId, num)
 	if err != nil {
 		seelog.Error(err.Error())
