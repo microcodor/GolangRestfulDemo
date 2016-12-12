@@ -208,15 +208,21 @@ func GetSimplePosts(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			simplewppostsbean.Common.Code = 1
 			simplewppostsbean.Common.Msg = "查询简版文章列表成功"
+		} else {
+			simplewppostsbean.Common.Code = 0
+			simplewppostsbean.Common.Msg = err.Error()
 		}
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-
+	if len(simplewppostsbean.Wpposts) <= 0 {
+		simplewppostsbean.Common.Code = 0
+		simplewppostsbean.Common.Msg = "暂无新的文章列表"
+		simplewppostsbean.Wpposts = make([]Wppost, 0)
+	}
 	if err := json.NewEncoder(w).Encode(simplewppostsbean); err != nil {
 		seelog.Error(err.Error())
 	}
-
 }
 
 func QuerySimplePosts(termId int, postId int, num int) ([]Wppost, error) {
