@@ -153,7 +153,7 @@ func GetWppost(w http.ResponseWriter, r *http.Request) {
 func QuerytWppost(postId int) (Wppost, error) {
 
 	stmt, _ := db.Prepare("select posts.ID, termships.term_taxonomy_id, posts.post_author, posts.post_date, posts.post_title, " +
-		"posts.post_content, posts.comment_status, posts.guid, posts.comment_count postmeta.meta_value as views_count from wp_posts posts " +
+		"posts.post_content, posts.comment_status, posts.guid, posts.comment_count, postmeta.meta_value as views_count from wp_posts posts " +
 		"inner join wp_term_relationships termships on termships.object_id=posts.ID " +
 		"inner join wp_postmeta postmeta on posts.ID = postmeta.post_id " +
 		"where ID = ?")
@@ -230,7 +230,7 @@ func GetSimplePosts(w http.ResponseWriter, r *http.Request) {
 func QuerySimplePosts(termId int, postId int, num int) ([]Wppost, error) {
 	stmt, _ := db.Prepare("select * from (select posts.ID as post_id,termships.term_taxonomy_id as term_id,posts.post_author as user_id," +
 		"posts.post_title as post_title,posts.guid as post_url,posts.post_date as post_date," +
-		"posts.comment_count as comment_count,users.user_nicename as user_nicename postmeta.meta_value as views_count from db_wordpress.wp_posts posts " +
+		"posts.comment_count as comment_count,users.user_nicename as user_nicename,postmeta.meta_value as views_count from db_wordpress.wp_posts posts " +
 		"inner join db_wordpress.wp_users users on posts.post_author=users.ID " +
 		"inner join db_wordpress.wp_term_relationships termships on termships.object_id=posts.ID " +
 		"inner join wp_postmeta postmeta on posts.ID = postmeta.post_id " +
