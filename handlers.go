@@ -156,7 +156,7 @@ func QuerytWppost(postId int) (Wppost, error) {
 		"posts.post_content, posts.comment_status, posts.guid, posts.comment_count, postmeta.meta_value as views_count from wp_posts posts " +
 		"inner join wp_term_relationships termships on termships.object_id=posts.ID " +
 		"inner join wp_postmeta postmeta on posts.ID = postmeta.post_id " +
-		"where ID = ?")
+		"where postmeta.meta_key='views' and ID = ?")
 	rows, err := stmt.Query(postId)
 	if err != nil {
 		seelog.Error(err.Error())
@@ -234,7 +234,7 @@ func QuerySimplePosts(termId int, postId int, num int) ([]Wppost, error) {
 		"inner join db_wordpress.wp_users users on posts.post_author=users.ID " +
 		"inner join db_wordpress.wp_term_relationships termships on termships.object_id=posts.ID " +
 		"inner join wp_postmeta postmeta on posts.ID = postmeta.post_id " +
-		"where posts.post_status='publish' and termships.term_taxonomy_id=? and posts.ID>?  LIMIT ?) as art ORDER BY art.post_id DESC")
+		"where posts.post_status='publish'  and postmeta.meta_key='views' and termships.term_taxonomy_id=? and posts.ID>?   LIMIT ?) as art ORDER BY art.post_id DESC")
 	rows, err := stmt.Query(termId, postId, num)
 	if err != nil {
 		seelog.Error(err.Error())
