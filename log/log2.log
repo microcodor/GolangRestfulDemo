@@ -57,3 +57,7 @@ repo.go /Users/jinchun/Documents/GOLang/src/GolangRestfulDemo/repo.go repo.go se
 repo.go /Users/jinchun/Documents/GOLang/src/GolangRestfulDemo/repo.go repo.go seelog error
 repo.go /Users/jinchun/Documents/GOLang/src/GolangRestfulDemo/repo.go repo.go seelog info
 repo.go /Users/jinchun/Documents/GOLang/src/GolangRestfulDemo/repo.go repo.go seelog debug
+handlers.go /Users/jinchun/Documents/GOLang/src/GolangRestfulDemo/handlers.go handlers.go QueryWpterms
+repo.go /Users/jinchun/Documents/GOLang/src/GolangRestfulDemo/repo.go repo.go seelog error
+repo.go /Users/jinchun/Documents/GOLang/src/GolangRestfulDemo/repo.go repo.go seelog info
+repo.go /Users/jinchun/Documents/GOLang/src/GolangRestfulDemo/repo.go repo.go seelog debug

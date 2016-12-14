@@ -57,3 +57,7 @@ Debug Dbg DEBUG DBG d seelog debug
 Error Err ERROR ERR e seelog error
 Info Inf INFO INF i seelog info
 Debug Dbg DEBUG DBG d seelog debug
+Error Err ERROR ERR e QueryWpterms
+Error Err ERROR ERR e seelog error
+Info Inf INFO INF i seelog info
+Debug Dbg DEBUG DBG d seelog debug

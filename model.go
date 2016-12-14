@@ -56,6 +56,7 @@ type Wppost struct {
 	CommentStatus string `json:"comment_status"`
 	PostUrl       string `json:"guid"`
 	CommentCount  int    `json:"comment_count"`
+	ViewsCount    int    `json:"views_count"`
 	User          Wpuser `json:"user, omitempty"`
 }
 
