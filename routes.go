@@ -43,6 +43,12 @@ var routes = Routes{
 		GetSimplePosts,
 	},
 	Route{
+		"SearchSimplePosts",
+		"GET",
+		"/searchsimpleposts/{keyword}/{index}/{num}",
+		SearchSimplePosts,
+	},
+	Route{
 		"TodoJson",
 		"GET",
 		"/testjson",

@@ -23,6 +23,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "GET /getwpterms:获取所有分类信息")
 	fmt.Fprintln(w, "GET /getwppost/{postId}:获取单篇文章")
 	fmt.Fprintln(w, "GET /getsimpleposts/{termId}/{postId}/{num}:简版文章分类列表")
+	fmt.Fprintln(w, "GET /searchsimpleposts/{keyword}/{index}/{num}:关键词搜索")
 }
 
 /*
@@ -246,6 +247,85 @@ func QuerySimplePosts(termId int, postId int, num int) ([]Wppost, error) {
 		var wppost Wppost
 		err = rows.Scan(&wppost.Id, &wppost.TermId, &wppost.PostAuthor,
 			&wppost.PostTitle, &wppost.PostUrl, &wppost.PostDate, &wppost.CommentCount, &wppost.User.NickName, &wppost.ViewsCount)
+		if err != nil {
+			seelog.Error(err.Error())
+		} else {
+			wppost.User.Id = wppost.PostAuthor
+			wpposts = append(wpposts, wppost)
+		}
+
+	}
+
+	return wpposts, err
+}
+
+/*
+接口五：简版文章标题关键字搜索列表
+*/
+func SearchSimplePosts(w http.ResponseWriter, r *http.Request) {
+	simplewppostsbean := new(SimpleWppostsBean)
+	simplewppostsbean.Common.Code = 0
+	simplewppostsbean.Common.Msg = "数据异常"
+
+	vars := mux.Vars(r)
+	var keyword string
+	var index int
+	var num int
+	var err error
+	keyword = vars["keyword"]
+	//fmt.Fprintln(w, "keyword:", keyword)
+	//	if keyword, err = strconv.Quote(vars["keyword"]); err != nil {
+	//		seelog.Error(err.Error())
+	//	}
+	if index, err = strconv.Atoi(vars["index"]); err != nil {
+		seelog.Error(err.Error())
+	}
+	if num, err = strconv.Atoi(vars["num"]); err != nil {
+		seelog.Error(err.Error())
+	}
+	if len(keyword) == 0 {
+		simplewppostsbean.Common.Msg = "请求参数错误"
+	} else {
+		simplewppostsbean.Wpposts, err = QueryByKeywordSimplePosts(keyword, index, num)
+		if err == nil {
+			simplewppostsbean.Common.Code = 1
+			simplewppostsbean.Common.Msg = "查询简版文章列表成功"
+		} else {
+			simplewppostsbean.Common.Code = 0
+			simplewppostsbean.Common.Msg = err.Error()
+		}
+	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	if len(simplewppostsbean.Wpposts) <= 0 {
+		simplewppostsbean.Common.Code = 0
+		simplewppostsbean.Common.Msg = "暂无新的文章列表"
+		simplewppostsbean.Wpposts = make([]Wppost, 0)
+	}
+	if err := json.NewEncoder(w).Encode(simplewppostsbean); err != nil {
+		seelog.Error(err.Error())
+	}
+}
+
+func QueryByKeywordSimplePosts(keyword string, index int, num int) ([]Wppost, error) {
+	var wpposts []Wppost
+	stmt, _ := db.Prepare("select posts.ID as post_id,posts.post_author as user_id," +
+		"posts.post_title as post_title,left(post_content,80) as post_content, posts.guid as post_url,posts.post_date as post_date," +
+		"posts.comment_count as comment_count,users.user_nicename as user_nicename from db_wordpress.wp_posts posts " +
+		"inner join db_wordpress.wp_users users on posts.post_author=users.ID " +
+		"where posts.post_status='publish' and posts.post_title like ? LIMIT ?,?")
+
+	rows, err := stmt.Query("%"+keyword+"%", index, num)
+	if err != nil {
+		seelog.Error(err.Error())
+		return wpposts, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var wppost Wppost
+		err = rows.Scan(&wppost.Id, &wppost.PostAuthor,
+			&wppost.PostTitle, &wppost.PostContent, &wppost.PostUrl, &wppost.PostDate, &wppost.CommentCount, &wppost.User.NickName)
 		if err != nil {
 			seelog.Error(err.Error())
 		} else {
