@@ -60,6 +60,19 @@ type Wppost struct {
 	User          Wpuser `json:"user, omitempty"`
 }
 
+/* 评论结构体 */
+type WpComment struct {
+	CommentId          int    `json:"comment_id"`
+	PostId             int    `json:"post_id"`
+	CommentAuthor      string `json:"comment_author"`
+	CommentAuthorEmail string `json:"comment_author_email"`
+	CommentAuthorIp    string `json:"comment_author_IP"`
+	CommentDate        string `json:"comment_date"`
+	CommentContent     string `json:"comment_content"`
+	CommentAgent       string `json:"comment_agent"`
+	UserId             int    `json:"user_id"`
+}
+
 /*
 JSON返回封装结构体
 */
